@@ -11,6 +11,9 @@ importers:
       '@types/chrome':
         specifier: ^0.0.302
         version: 0.0.302
+      node-zip:
+        specifier: ^1.1.1
+        version: 1.1.1
       typescript:
         specifier: ^5.7.3
         version: 5.7.3
@@ -28,6 +31,16 @@ packages:
 
   '@types/har-format@1.2.16':
     resolution: {integrity: sha512-fluxdy7ryD3MV6h8pTfTYpy/xQzCFC7m89nOH9y94cNqJ1mDIDPut7MnRHI3F6qRmh/cT2fUjG1MLdCNb4hE9A==}
+
+  jszip@2.5.0:
+    resolution: {integrity: sha512-IRoyf8JSYY3nx+uyh5xPc0qdy8pUDTp2UkHOWYNF/IO/3D8nx7899UlSAjD8rf8wUgOmm0lACWx/GbW3EaxIXQ==}
+
+  node-zip@1.1.1:
+    resolution: {integrity: sha512-sXfGL65EcaAJqNSXxuyf//i4D4geUtJgZDYUd7IBo2/CH8XY8vcWh1+CBCxuVVyR+S4vAFc3hr//JkCi2+V5vg==}
+    hasBin: true
+
+  pako@0.2.9:
+    resolution: {integrity: sha512-NUcwaKxUxWrZLpDG+z/xZaCgQITkA/Dv4V/T6bw7VON6l1Xz/VnrBqrYjZQ12TamKHzITTfOEIYUj48y2KXImA==}
 
   typescript@5.7.3:
     resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
@@ -48,5 +61,15 @@ snapshots:
   '@types/filewriter@0.0.33': {}
 
   '@types/har-format@1.2.16': {}
+
+  jszip@2.5.0:
+    dependencies:
+      pako: 0.2.9
+
+  node-zip@1.1.1:
+    dependencies:
+      jszip: 2.5.0
+
+  pako@0.2.9: {}
 
   typescript@5.7.3: {}
