@@ -1,6 +1,6 @@
 {
   "name": "Quick Share",
-  "version": "1.0",
+  "version": "1.1",
   "manifest_version": 3,
   "description": "Share anything from the context menu",
   "permissions": [
@@ -10,6 +10,15 @@
   ],
   "background": {
     "service_worker": "background.js"
+  },
+  "commands": {
+    "share-current-page-url": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+C",
+        "mac": "Command+Shift+C"
+      },
+      "description": "Share current page URL"
+    }
   },
   "icons": {
     "16": "icons/icon16.png",
