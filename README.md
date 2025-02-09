@@ -1,4 +1,4 @@
-# <img src="assets/icon.png" width="45" align="left"> Quick Share
+# <img src="assets/icon.png" width="45" align="left"> Quick Menu Share
 
 Chrome extension to share anything from the context menu.
 
