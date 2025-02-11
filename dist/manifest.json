@@ -1,6 +1,6 @@
 {
   "name": "Quick Menu Share",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "manifest_version": 3,
   "description": "Share anything from the context menu",
   "permissions": [

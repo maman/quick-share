@@ -4,6 +4,7 @@
   "description": "Share anything from the context menu",
   "main": "index.js",
   "scripts": {
+    "dev": "tsc --watch",
     "build": "tsc && node scripts/build.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
