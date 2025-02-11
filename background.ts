@@ -1,6 +1,94 @@
 const supportedContexts = ["page", "selection", "link"] as const;
 type SupportedContextType = (typeof supportedContexts)[number];
 
+async function showToast(text: string, tabId: number) {
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    args: [text],
+    func: (text) => {
+      const existingToast = document.querySelector('div[data-toast-id="url-copy-toast"]');
+      if (existingToast) {
+        return;
+      }
+
+      // Small delay before showing new toast to prevent visual overlap
+      const showToast = () => {
+        const toast = document.createElement('div');
+        toast.dataset.toastId = 'toast';
+        const shadowRoot = toast.attachShadow({ mode: 'closed' });
+
+        const toastContent = document.createElement('div');
+        toastContent.textContent = text;
+
+        const style = document.createElement('style');
+        style.textContent = `
+                  @keyframes slideIn {
+                    0% {
+                      transform: translateY(-100%);
+                      opacity: 0;
+                    }
+                    70% {
+                      transform: translateY(3px);
+                      opacity: 1;
+                    }
+                    100% {
+                      transform: translateY(0);
+                      opacity: 1;
+                    }
+                  }
+                  
+                  .toast {
+                    position: fixed;
+                    top: 10px;
+                    right: 10px;
+                    background: ${window.matchMedia('(prefers-color-scheme: dark)').matches ? '#333' : '#f5f5f5'};
+                    color: ${window.matchMedia('(prefers-color-scheme: dark)').matches ? '#fff' : '#333'};
+                    border: 1px solid rgba(128, 128, 128, 0.3);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                    padding: 12px 24px;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    font-size: 12px;
+                    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 
+                               Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                    z-index: 10000;
+                    animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+                  }
+                  
+                  .toast.hiding {
+                    opacity: 0;
+                    transform: translateY(-100%);
+                  }
+                `;
+
+        toastContent.className = 'toast';
+        shadowRoot.appendChild(style);
+        shadowRoot.appendChild(toastContent);
+
+        document.body.appendChild(toast);
+
+        const remove = () => {
+          toastContent.classList.add('hiding');
+          setTimeout(() => toast.remove(), 150);
+        };
+
+        const timeout = setTimeout(remove, 3000);
+        const handleEscape = (e: KeyboardEvent) => {
+          if (e.key === 'Escape') {
+            remove();
+            document.removeEventListener('keydown', handleEscape);
+            clearTimeout(timeout);
+          }
+        };
+        document.addEventListener('keydown', handleEscape);
+      };
+
+      showToast();
+    }
+  });
+}
+
 chrome.commands.onCommand.addListener((command) => {
   if (command === "share-current-page-url") {
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs: chrome.tabs.Tab[]) => {
@@ -66,38 +154,7 @@ chrome.commands.onCommand.addListener((command) => {
         });
         if (result && result[0] && result[0].result) {
           const copiedText = result[0].result as string;
-          await chrome.scripting.executeScript({
-            target: { tabId: tabs[0].id || 0 },
-            args: [copiedText],
-            func: (text) => {
-              const toast = document.createElement('div');
-              toast.textContent = `URL copied to clipboard`;
-              toast.style.cssText = `
-                position: fixed;
-                top: 10px;
-                right: 10px;
-                background: ${window.matchMedia('(prefers-color-scheme: dark)').matches ? '#333' : '#f5f5f5'};
-                color: ${window.matchMedia('(prefers-color-scheme: dark)').matches ? '#fff' : '#333'};
-                border: 1px solid rgba(128, 128, 128, 0.3);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                padding: 12px 24px;
-                border-radius: 4px;
-                font-weight: bold;
-                font-size: 12px;
-                z-index: 10000;
-              `;
-              document.body.appendChild(toast);
-              const timeout = setTimeout(() => toast.remove(), 3000);
-              const handleEscape = (e: KeyboardEvent) => {
-                if (e.key === 'Escape') {
-                  toast.remove();
-                  document.removeEventListener('keydown', handleEscape);
-                  clearTimeout(timeout);
-                }
-              };
-              document.addEventListener('keydown', handleEscape);
-            }
-          });
+          await showToast("URL Copied to Clipboard", tabs[0].id || 0);
         }
       }
     });
